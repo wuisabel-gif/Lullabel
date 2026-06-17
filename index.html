@@ -138,7 +138,16 @@
   .midmeaning b{color:var(--plum);font-weight:700;}
   .zodiac{margin:6px 0 22px;background:#FBF4EF;border:1px solid var(--line);border-radius:18px;padding:14px;transition:background-color .6s ease,border-color .6s ease;}
   .zhead{font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--rose-deep);margin-bottom:11px;}
-  .zgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  .zgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:10px;}
+  .numo{
+    display:inline-flex;align-items:center;gap:9px;margin:0 auto 20px;
+    background:#FBF1EC;border:1px solid var(--line);border-radius:999px;
+    padding:5px 16px 5px 5px;font-size:.82rem;color:var(--soft);transition:background-color .6s ease,border-color .6s ease;
+  }
+  .numo-n{
+    display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
+    background:var(--rose);color:#fff;font-weight:800;font-size:.9rem;flex:none;
+  }
   .zbadge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 8px;}
   .zsym{font-size:1.5rem;line-height:1;}
   .zbadge b{color:var(--plum);font-size:.95rem;font-weight:800;}
@@ -560,7 +569,9 @@ function westernSign(m,d){
   for(const sgn of signs){ if(m<sgn.last[0] || (m===sgn.last[0] && d<=sgn.last[1])) return sgn; }
   return signs[0]; // late December -> Capricorn
 }
-function chineseZodiac(y){
+// Chinese New Year dates (Gregorian) so the animal flips on the real new year, not Jan 1
+const CNY={1990:[1,27],1991:[2,15],1992:[2,4],1993:[1,23],1994:[2,10],1995:[1,31],1996:[2,19],1997:[2,7],1998:[1,28],1999:[2,16],2000:[2,5],2001:[1,24],2002:[2,12],2003:[2,1],2004:[1,22],2005:[2,9],2006:[1,29],2007:[2,18],2008:[2,7],2009:[1,26],2010:[2,14],2011:[2,3],2012:[1,23],2013:[2,10],2014:[1,31],2015:[2,19],2016:[2,8],2017:[1,28],2018:[2,16],2019:[2,5],2020:[1,25],2021:[2,12],2022:[2,1],2023:[1,22],2024:[2,10],2025:[1,29],2026:[2,17],2027:[2,6],2028:[1,26],2029:[2,13],2030:[2,3],2031:[1,23],2032:[2,11],2033:[1,31],2034:[2,19],2035:[2,8],2036:[1,28],2037:[2,15],2038:[2,4],2039:[1,24],2040:[2,12],2041:[2,1],2042:[1,22],2043:[2,10],2044:[1,30]};
+function chineseZodiac(y,m,d){
   const a=[
     {n:'Rat',s:'🐀',t:'clever & resourceful',v:['modern','joyful']},
     {n:'Ox',s:'🐂',t:'steady & dependable',v:['strong','classic']},
@@ -575,7 +586,25 @@ function chineseZodiac(y){
     {n:'Dog',s:'🐕',t:'loyal & kind',v:['gentle','classic']},
     {n:'Pig',s:'🐖',t:'warm & generous',v:['joyful','gentle']},
   ];
-  return a[(((y-4)%12)+12)%12];
+  let ey=y;
+  const c=CNY[y];
+  if(c && (m<c[0] || (m===c[0] && d<c[1]))) ey=y-1; // born before the new year -> previous animal
+  return a[(((ey-4)%12)+12)%12];
+}
+function birthSeason(m){
+  if(m===12||m<=2) return {n:'Winter',s:'❄️',v:['celestial','gentle']};
+  if(m<=5) return {n:'Spring',s:'🌷',v:['nature','joyful']};
+  if(m<=8) return {n:'Summer',s:'☀️',v:['joyful','celestial']};
+  return {n:'Autumn',s:'🍂',v:['vintage','nature']};
+}
+// Pythagorean numerology: reduce a name's letters to its single-digit "life number" (keeping masters 11/22/33)
+const NUM_MAP={a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9,j:1,k:2,l:3,m:4,n:5,o:6,p:7,q:8,r:9,s:1,t:2,u:3,v:4,w:5,x:6,y:7,z:8};
+const NUMO={1:'a leader — independent & bold',2:'a peacemaker — gentle & kind',3:'expressive — joyful & creative',4:'grounded — steady & dependable',5:'free-spirited — curious & adventurous',6:'nurturing — loving & responsible',7:'a seeker — thoughtful & wise',8:'capable — ambitious & driven',9:'compassionate — generous & idealistic',11:'intuitive — an inspired old soul',22:'a visionary — the master builder',33:'devoted — a nurturing guide'};
+function nameNumber(str){
+  let sum=0; for(const ch of (str||'').toLowerCase()){ if(NUM_MAP[ch]) sum+=NUM_MAP[ch]; }
+  if(!sum) return null;
+  while(sum>9 && sum!==11 && sum!==22 && sum!==33){ sum=String(sum).split('').reduce((a,c)=>a+(+c),0); }
+  return sum;
 }
 function deriveBirth(str){
   if(!str) return null;
@@ -584,7 +613,7 @@ function deriveBirth(str){
   const m=dt.getMonth()+1, day=dt.getDate(), y=dt.getFullYear();
   const STONE=['Garnet','Amethyst','Aquamarine','Diamond','Emerald','Pearl','Ruby','Peridot','Sapphire','Opal','Topaz','Turquoise'];
   const FLOWER=['Carnation','Violet','Daffodil','Daisy','Lily of the valley','Rose','Larkspur','Gladiolus','Aster','Marigold','Chrysanthemum','Narcissus'];
-  return {west:westernSign(m,day), chin:chineseZodiac(y), stone:STONE[m-1], flower:FLOWER[m-1]};
+  return {west:westernSign(m,day), chin:chineseZodiac(y,m,day), season:birthSeason(m), stone:STONE[m-1], flower:FLOWER[m-1]};
 }
 document.getElementById('bday').addEventListener('change', e=>{
   lastBirth = deriveBirth(e.target.value);
@@ -619,6 +648,7 @@ function render(name){
   const sur = escapeHtml(document.getElementById('surname').value.trim());
   const mid = lastMiddle;
   const full = name.n + (mid?' '+mid.n:'') + (sur?' '+sur:'');
+  const num = nameNumber(name.n + (mid?mid.n:'') + document.getElementById('surname').value.trim());
   const isSaved = saved.some(s=>s.n===name.n);
   r.innerHTML = `
     <div class="name-card" id="nameCard">
@@ -628,6 +658,7 @@ function render(name){
       ${mid?`<div class="midmeaning">middle name · <b>${mid.n}</b>, ${mid.m}</div>`:''}
       <div class="pron">${name.p}</div>
       <p class="meaning"><strong>${name.n}</strong> means <strong>${name.m}</strong>.</p>
+      ${num?`<div class="numo"><span class="numo-n">${num}</span> name number ${num} · ${NUMO[num]}</div>`:''}
       <div class="chips">
         <span class="chip">origin · <b>${name.o}</b></span>
         ${(name.r||[]).map(t=>`<span class="chip">faith · <b>${RLABEL[t]}</b></span>`).join('')}
@@ -639,6 +670,7 @@ function render(name){
         <div class="zgrid">
           <div class="zbadge"><span class="zsym">${lastBirth.west.s}</span><b>${lastBirth.west.n}</b><i>${lastBirth.west.el} · ${lastBirth.west.t}</i></div>
           <div class="zbadge"><span class="zsym">${lastBirth.chin.s}</span><b>${lastBirth.chin.n}</b><i>${lastBirth.chin.t}</i></div>
+          <div class="zbadge"><span class="zsym">${lastBirth.season.s}</span><b>${lastBirth.season.n}</b><i>season of birth</i></div>
           <div class="zbadge"><span class="zsym">💎</span><b>${lastBirth.stone}</b><i>birthstone</i></div>
           <div class="zbadge"><span class="zsym">🌸</span><b>${lastBirth.flower}</b><i>birth flower</i></div>
         </div>
@@ -662,7 +694,7 @@ function generate(){
   // lean toward the baby's zodiac qualities when a birth date is set
   let candidates = list;
   if(lastBirth){
-    const prefs = [...lastBirth.west.v, ...lastBirth.chin.v];
+    const prefs = [...lastBirth.west.v, ...lastBirth.chin.v, ...lastBirth.season.v];
     const matched = list.filter(x=>x.v.some(t=>prefs.includes(t)));
     if(matched.length) candidates = matched;
   }
