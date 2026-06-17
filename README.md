@@ -1,6 +1,6 @@
 # Lullabel 🌙
 
-**A gentle baby-name generator that suggests real names, with meanings, origins, faith traditions, and zodiac signs. It also lets you shape full first–middle–last combinations to save.**
+**A baby-name generator that suggests real names, with meanings, origins, faith traditions, and zodiac signs. It also lets you shape full first–middle–last combinations to save.**
 
 ---
 
