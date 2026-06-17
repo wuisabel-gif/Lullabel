@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lullabel — baby names to grow into</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --milk:#FBF6EF;
+    --blush:#F7E4E1;
+    --rose:#E6A6B4;
+    --rose-deep:#C76B83;
+    --sage:#A7C4A0;
+    --honey:#F2C879;
+    --sky:#Acc9e0;
+    --plum:#5A4258;
+    --ink:#473543;
+    --soft:#8a7480;
+    --card:#FFFFFF;
+    --line:#EFE2DA;
+    --shadow:24px 28px 60px -28px rgba(122,77,98,.45);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Nunito',system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--milk);
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .6s ease;
+  }
+  /* smooth the theme swap on the pieces that carry the accent */
+  .blob,.panel,.name-card,.gtag,.chip,.saved,.saved-empty,.empty{transition:background-color .6s ease,border-color .6s ease;}
+  :root{--blush:#F7E4E1;--rose:#E6A6B4;--rose-deep:#C76B83;}
+
+  /* ambient drifting blobs */
+  .sky-blobs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .blob{position:absolute;border-radius:50%;filter:blur(46px);opacity:.55;animation:drift 22s ease-in-out infinite;}
+  .blob.b1{width:340px;height:340px;background:var(--blush);top:-90px;left:-70px;}
+  .blob.b2{width:300px;height:300px;background:#DCEBD6;top:38%;right:-90px;animation-delay:-7s;}
+  .blob.b3{width:260px;height:260px;background:#FBEBC8;bottom:-80px;left:18%;animation-delay:-13s;}
+  .blob.b4{width:220px;height:220px;background:#DDEAF4;top:8%;right:24%;animation-delay:-4s;}
+  @keyframes drift{
+    0%,100%{transform:translate(0,0) scale(1);}
+    33%{transform:translate(26px,-22px) scale(1.08);}
+    66%{transform:translate(-20px,18px) scale(.95);}
+  }
+
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:34px 22px 90px;}
+
+  /* hero */
+  header{text-align:center;padding:30px 0 8px;}
+  .brand{
+    font-family:'Fraunces',serif;font-weight:600;font-size:1.5rem;color:var(--plum);
+    letter-spacing:.02em;margin-bottom:18px;display:inline-flex;align-items:center;gap:9px;
+  }
+  .brand .mark{
+    color:var(--rose-deep);font-size:1.2rem;
+    display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;
+    background:var(--blush);transition:background-color .6s ease,color .6s ease;
+  }
+  .eyebrow{
+    font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--rose-deep);font-weight:700;display:inline-flex;align-items:center;gap:9px;
+  }
+  .eyebrow::before,.eyebrow::after{content:"";width:26px;height:1px;background:var(--rose);opacity:.6;}
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(2.5rem,8vw,4.1rem);
+    line-height:1.04;
+    margin:.32em 0 .28em;
+    color:var(--plum);
+    letter-spacing:-.01em;
+  }
+  h1 em{font-style:italic;color:var(--rose-deep);}
+  .lede{max-width:430px;margin:0 auto;color:var(--soft);font-size:1.06rem;}
+
+  /* controls */
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:30px;
+    padding:30px 26px 32px;
+    margin-top:36px;
+    box-shadow:var(--shadow);
+  }
+  .field{margin-bottom:24px;}
+  .field:last-child{margin-bottom:0;}
+  .label{
+    font-size:.82rem;font-weight:800;letter-spacing:.04em;
+    color:var(--plum);margin-bottom:11px;display:flex;align-items:center;gap:7px;
+  }
+  .label .dot{width:7px;height:7px;border-radius:50%;background:var(--honey);}
+
+  .pills{display:flex;flex-wrap:wrap;gap:9px;}
+  .pill{
+    font-family:inherit;font-size:.95rem;font-weight:700;
+    border:1.5px solid var(--line);background:#FCF8F4;color:var(--soft);
+    padding:9px 17px;border-radius:999px;cursor:pointer;transition:.18s ease;
+  }
+  .pill:hover{border-color:var(--rose);color:var(--rose-deep);transform:translateY(-1px);}
+  .pill[aria-pressed="true"]{
+    background:var(--rose);border-color:var(--rose);color:#fff;
+    box-shadow:0 8px 18px -8px rgba(199,107,131,.7);
+  }
+  .pill.vibe[aria-pressed="true"]{background:var(--sage);border-color:var(--sage);box-shadow:0 8px 18px -8px rgba(123,160,113,.7);}
+
+  .letter-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  select{
+    font-family:inherit;font-size:.95rem;font-weight:700;color:var(--plum);
+    border:1.5px solid var(--line);background:#FCF8F4;border-radius:14px;
+    padding:10px 16px;cursor:pointer;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C76B83' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;
+  }
+  .letter-row .hint{color:var(--soft);font-size:.86rem;}
+  .opt{font-weight:600;color:var(--soft);font-size:.74rem;background:#FBF1EC;padding:2px 9px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;}
+  .text-in{
+    width:100%;font-family:inherit;font-size:1rem;font-weight:600;color:var(--plum);
+    border:1.5px solid var(--line);background:#FCF8F4;border-radius:14px;
+    padding:12px 16px;margin-bottom:8px;transition:border-color .2s ease,box-shadow .2s ease;
+  }
+  .text-in::placeholder{color:#C9B7BF;font-weight:500;}
+  .text-in:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 4px rgba(199,107,131,.12);}
+  .text-in + .hint{display:block;color:var(--soft);font-size:.86rem;}
+  .fullname{
+    font-family:'Fraunces',serif;font-weight:500;color:var(--rose-deep);
+    font-size:clamp(1.3rem,5vw,1.7rem);margin:2px 0 6px;letter-spacing:-.01em;
+  }
+  .midmeaning{font-size:.86rem;color:var(--soft);margin:-2px 0 4px;}
+  .midmeaning b{color:var(--plum);font-weight:700;}
+  .zodiac{margin:6px 0 22px;background:#FBF4EF;border:1px solid var(--line);border-radius:18px;padding:14px;transition:background-color .6s ease,border-color .6s ease;}
+  .zhead{font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--rose-deep);margin-bottom:11px;}
+  .zgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  .zbadge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 8px;}
+  .zsym{font-size:1.5rem;line-height:1;}
+  .zbadge b{color:var(--plum);font-size:.95rem;font-weight:800;}
+  .zbadge i{color:var(--soft);font-size:.74rem;font-style:normal;line-height:1.35;}
+
+  .generate{
+    width:100%;margin-top:30px;
+    font-family:'Fraunces',serif;font-size:1.22rem;font-weight:500;letter-spacing:.01em;
+    color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(120deg,var(--rose-deep),var(--rose));
+    padding:17px 24px;border-radius:20px;
+    box-shadow:0 16px 30px -12px rgba(199,107,131,.8);
+    transition:.2s ease;display:inline-flex;align-items:center;justify-content:center;gap:11px;
+  }
+  .generate:hover{transform:translateY(-2px);box-shadow:0 22px 38px -12px rgba(199,107,131,.85);}
+  .generate:active{transform:translateY(0);}
+  .generate .star{display:inline-block;animation:twinkle 2.4s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.25);opacity:1;}}
+
+  /* result card */
+  .result{margin-top:30px;min-height:10px;}
+  .name-card{
+    position:relative;background:var(--card);border:1px solid var(--line);
+    border-radius:30px;padding:38px 30px 30px;text-align:center;box-shadow:var(--shadow);
+    overflow:hidden;animation:rise .55s cubic-bezier(.2,.8,.25,1);
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(22px) scale(.98);}to{opacity:1;transform:none;}}
+  .name-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:8px;
+    background:linear-gradient(90deg,var(--rose),var(--honey),var(--sage),var(--sky));
+  }
+  .gtag{
+    display:inline-flex;align-items:center;gap:7px;font-size:.74rem;font-weight:800;
+    letter-spacing:.13em;text-transform:uppercase;color:var(--soft);
+    background:#FBF1EC;border-radius:999px;padding:6px 14px;margin-bottom:8px;
+  }
+  .gtag .gdot{width:8px;height:8px;border-radius:50%;}
+  .name{
+    font-family:'Fraunces',serif;font-weight:600;color:var(--plum);
+    font-size:clamp(2.6rem,11vw,4.4rem);line-height:1.02;margin:6px 0 4px;letter-spacing:-.02em;
+  }
+  .pron{color:var(--rose-deep);font-style:italic;font-family:'Fraunces',serif;font-size:1.1rem;margin-bottom:18px;}
+  .meaning{max-width:430px;margin:0 auto 20px;color:var(--ink);font-size:1.08rem;}
+  .meaning strong{color:var(--plum);}
+  .chips{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-bottom:26px;}
+  .chip{font-size:.8rem;font-weight:700;color:var(--soft);background:#F6EFE8;border-radius:999px;padding:6px 13px;}
+  .chip b{color:var(--rose-deep);font-weight:800;}
+
+  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .btn{
+    font-family:inherit;font-weight:800;font-size:.96rem;cursor:pointer;
+    border-radius:15px;padding:12px 22px;border:1.5px solid var(--line);
+    background:#FCF8F4;color:var(--plum);transition:.18s ease;display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn:hover{transform:translateY(-1px);border-color:var(--rose);color:var(--rose-deep);}
+  .btn.save[aria-pressed="true"]{background:var(--rose);border-color:var(--rose);color:#fff;}
+  .btn .heart{transition:transform .2s ease;}
+  .btn.save[aria-pressed="true"] .heart{animation:pop .35s ease;}
+  @keyframes pop{0%{transform:scale(1);}45%{transform:scale(1.5);}100%{transform:scale(1);}}
+
+  .empty{
+    text-align:center;color:var(--soft);background:var(--card);border:1.5px dashed var(--line);
+    border-radius:24px;padding:30px;font-size:1rem;
+  }
+
+  /* shortlist */
+  .shortlist{margin-top:46px;}
+  .shortlist h2{
+    font-family:'Fraunces',serif;font-weight:500;font-size:1.5rem;color:var(--plum);
+    display:flex;align-items:center;gap:10px;margin:0 0 4px;
+  }
+  .shortlist .count{font-size:.82rem;font-weight:800;color:#fff;background:var(--rose);border-radius:999px;padding:2px 10px;}
+  .shortlist .sub{color:var(--soft);font-size:.94rem;margin:0 0 18px;}
+  .saved-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .saved{
+    position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:16px 16px 14px;animation:rise .4s ease;
+  }
+  .saved .sn{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--plum);line-height:1.1;}
+  .saved .sm{font-size:.82rem;color:var(--soft);margin-top:3px;}
+  .saved .rm{
+    position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;
+    border:none;background:#F6EFE8;color:var(--rose-deep);cursor:pointer;font-size:.9rem;line-height:1;
+    display:flex;align-items:center;justify-content:center;transition:.15s;
+  }
+  .saved .rm:hover{background:var(--rose);color:#fff;}
+  .saved-empty{color:var(--soft);font-size:.95rem;background:#FCF8F4;border:1.5px dashed var(--line);border-radius:18px;padding:22px;text-align:center;}
+
+  footer{text-align:center;margin-top:54px;color:var(--soft);font-size:.85rem;}
+  footer .h{color:var(--rose-deep);}
+  footer .copy{margin-top:8px;font-size:.8rem;}
+  footer a{
+    color:var(--rose-deep);font-weight:700;text-decoration:none;
+    display:inline-flex;align-items:center;gap:5px;border-bottom:1px solid transparent;transition:border-color .2s ease;
+  }
+  footer a:hover{border-color:var(--rose-deep);}
+  footer a svg{width:14px;height:14px;fill:currentColor;}
+
+  /* sparkle on reveal */
+  .spark{position:absolute;width:10px;height:10px;pointer-events:none;z-index:5;}
+  .spark svg{width:100%;height:100%;animation:sparkle .9s ease forwards;}
+  @keyframes sparkle{0%{transform:scale(0) rotate(0);opacity:0;}30%{opacity:1;}100%{transform:scale(1.4) rotate(90deg);opacity:0;}}
+
+  @media (max-width:480px){
+    .panel{padding:24px 18px 26px;border-radius:24px;}
+    .name-card{padding:32px 20px 26px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;}
+    html{scroll-behavior:auto;}
+  }
+
+  /* ===== gender color themes — recolor the accent + ambient blobs ===== */
+  body[data-theme="girl"]{--rose:#E6A6B4;--rose-deep:#C76B83;--blush:#F7E4E1;}
+  body[data-theme="girl"] .blob.b1{background:#F7E4E1;}
+  body[data-theme="girl"] .blob.b2{background:#F6D7DE;}
+  body[data-theme="girl"] .blob.b3{background:#FBE3D6;}
+  body[data-theme="girl"] .blob.b4{background:#F3D9E4;}
+
+  body[data-theme="boy"]{--rose:#8FB8D8;--rose-deep:#3F77A1;--blush:#DCEAF4;}
+  body[data-theme="boy"] .blob.b1{background:#DCEAF4;}
+  body[data-theme="boy"] .blob.b2{background:#D2E4EF;}
+  body[data-theme="boy"] .blob.b3{background:#E3EEF6;}
+  body[data-theme="boy"] .blob.b4{background:#D8E6F2;}
+
+  body[data-theme="either"]{--rose:#9DBE94;--rose-deep:#5E8456;--blush:#E2EFDD;}
+  body[data-theme="either"] .blob.b1{background:#E2EFDD;}
+  body[data-theme="either"] .blob.b2{background:#DCEBD6;}
+  body[data-theme="either"] .blob.b3{background:#EDF3DF;}
+  body[data-theme="either"] .blob.b4{background:#DEEBE0;}
+</style>
+</head>
+<body>
+<div class="sky-blobs" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="mark">☾</span> Lullabel</div>
+    <span class="eyebrow">for the little one on the way</span>
+    <h1>Find a name to <em>grow into.</em></h1>
+    <p class="lede">Tell us the feeling you're after, and we'll pull a name with its meaning and where it comes from.</p>
+  </header>
+
+  <section class="panel" aria-label="Name preferences">
+    <div class="field">
+      <div class="label"><span class="dot"></span>Who's it for?</div>
+      <div class="pills" id="genderPills" role="group">
+        <button class="pill" data-g="girl" aria-pressed="false">For her</button>
+        <button class="pill" data-g="boy" aria-pressed="false">For him</button>
+        <button class="pill" data-g="either" aria-pressed="true">Either is lovely</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="label"><span class="dot"></span>What's the feeling?</div>
+      <div class="pills" id="vibePills" role="group">
+        <button class="pill vibe" data-v="any" aria-pressed="true">Anything</button>
+        <button class="pill vibe" data-v="classic" aria-pressed="false">Timeless</button>
+        <button class="pill vibe" data-v="nature" aria-pressed="false">Nature</button>
+        <button class="pill vibe" data-v="celestial" aria-pressed="false">Celestial</button>
+        <button class="pill vibe" data-v="vintage" aria-pressed="false">Old soul</button>
+        <button class="pill vibe" data-v="modern" aria-pressed="false">Fresh</button>
+        <button class="pill vibe" data-v="mythical" aria-pressed="false">Mythical</button>
+        <button class="pill vibe" data-v="strong" aria-pressed="false">Strong</button>
+        <button class="pill vibe" data-v="gentle" aria-pressed="false">Gentle</button>
+        <button class="pill vibe" data-v="royal" aria-pressed="false">Regal</button>
+        <button class="pill vibe" data-v="joyful" aria-pressed="false">Joyful</button>
+        <button class="pill vibe" data-v="literary" aria-pressed="false">Literary</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="label"><span class="dot"></span>Faith</div>
+      <div class="pills" id="faithPills" role="group">
+        <button class="pill" data-f="any" aria-pressed="true">All faiths</button>
+        <button class="pill" data-f="christian" aria-pressed="false">Christian</button>
+        <button class="pill" data-f="jewish" aria-pressed="false">Jewish</button>
+        <button class="pill" data-f="muslim" aria-pressed="false">Muslim</button>
+        <button class="pill" data-f="hindu" aria-pressed="false">Hindu</button>
+        <button class="pill" data-f="sikh" aria-pressed="false">Sikh</button>
+        <button class="pill" data-f="buddhist" aria-pressed="false">Buddhist</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="label"><span class="dot"></span>Starts with</div>
+      <div class="letter-row">
+        <select id="letter" aria-label="Starting letter">
+          <option value="any">Any letter</option>
+        </select>
+        <span class="hint">optional — leave it open for a surprise</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="label"><span class="dot"></span>Middle name</div>
+      <div class="pills" id="midPills" role="group">
+        <button class="pill" data-mid="off" aria-pressed="true">Just a first name</button>
+        <button class="pill" data-mid="on" aria-pressed="false">Add a middle name</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="label"><span class="dot"></span>Family name <span class="opt">optional</span></div>
+      <input id="surname" class="text-in" type="text" placeholder="e.g. Rivera" maxlength="28" autocomplete="off">
+      <span class="hint">add yours to hear how the whole name sounds together</span>
+    </div>
+
+    <div class="field">
+      <div class="label"><span class="dot"></span>Birthday or due date <span class="opt">optional</span></div>
+      <input id="bday" class="text-in" type="date">
+      <span class="hint">reveals the star sign, Chinese zodiac, birthstone &amp; flower — and leans names that way</span>
+    </div>
+
+    <button class="generate" id="genBtn">
+      <span class="star">✦</span> Show me a name
+    </button>
+  </section>
+
+  <div class="result" id="result" aria-live="polite"></div>
+
+  <section class="shortlist">
+    <h2>Your shortlist <span class="count" id="savedCount">0</span></h2>
+    <p class="sub">The names you've kept. Tap a name's heart to add it here.</p>
+    <div id="savedArea"></div>
+  </section>
+
+  <footer>
+    <div><strong style="color:var(--plum)">Lullabel</strong> · made with <span class="h">♥</span> for the wait that's almost over.</div>
+    <div class="copy">© 2026 Lullabel · built by
+      <a href="https://github.com/wuisabel-gif" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        @wuisabel-gif
+      </a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const NAMES = [
+  // girls
+  {n:"Aria",g:"girl",p:"AH-ree-ah",o:"Italian",m:"air, or a beautiful melody",v:["modern","classic","joyful"]},
+  {n:"Luna",g:"girl",p:"LOO-nah",o:"Latin",m:"the moon",v:["celestial","gentle"]},
+  {n:"Ivy",g:"girl",p:"EYE-vee",o:"English",m:"faithfulness, and the climbing vine",v:["nature","vintage","gentle"]},
+  {n:"Willow",g:"girl",p:"WIL-oh",o:"English",m:"the graceful, bending willow tree",v:["nature","modern","gentle"]},
+  {n:"Stella",g:"girl",p:"STEH-lah",o:"Latin",m:"a star",v:["celestial","vintage","joyful"]},
+  {n:"Maeve",g:"girl",p:"MAYV",o:"Irish",m:"she who rules, a warrior queen",v:["mythical","vintage","strong","royal"]},
+  {n:"Hazel",g:"girl",p:"HAY-zəl",o:"English",m:"the hazelnut tree",v:["nature","vintage","gentle"]},
+  {n:"Freya",g:"girl",p:"FRAY-ah",o:"Norse",m:"a lady; the goddess of love",v:["mythical","strong"]},
+  {n:"Clara",g:"girl",p:"KLAIR-ah",o:"Latin",m:"bright and clear",v:["classic","vintage","joyful","gentle"]},
+  {n:"Aurora",g:"girl",p:"aw-ROR-ah",o:"Latin",m:"the dawn",v:["celestial","mythical","joyful"]},
+  {n:"Juniper",g:"girl",p:"JOO-nih-pər",o:"Latin",m:"the evergreen shrub, ever green",v:["nature","modern"]},
+  {n:"Eleanor",g:"girl",p:"EL-ə-nor",o:"English",m:"a bright, shining one",v:["classic","vintage","royal"]},
+  {n:"Iris",g:"girl",p:"EYE-riss",o:"Greek",m:"the rainbow, and the flower",v:["nature","mythical","gentle","joyful"]},
+  {n:"Daphne",g:"girl",p:"DAF-nee",o:"Greek",m:"the laurel tree",v:["mythical","nature","literary","gentle"]},
+  {n:"Eloise",g:"girl",p:"EL-oh-eez",o:"French",m:"healthy and wide",v:["vintage","classic","gentle"]},
+  {n:"Selene",g:"girl",p:"seh-LEE-nee",o:"Greek",m:"goddess of the moon",v:["celestial","mythical"]},
+  {n:"Vivian",g:"girl",p:"VIV-ee-ən",o:"Latin",m:"full of life",v:["classic","vintage","joyful"]},
+  {n:"Lyra",g:"girl",p:"LY-rah",o:"Greek",m:"the lyre, a constellation of song",v:["celestial","mythical","literary"]},
+  {n:"Margot",g:"girl",p:"MAR-go",o:"French",m:"a pearl",v:["vintage","classic","royal"]},
+  {n:"Beatrix",g:"girl",p:"BEE-ə-trix",o:"Latin",m:"she who brings happiness",v:["vintage","classic","joyful","royal"]},
+  {n:"Cleo",g:"girl",p:"KLEE-oh",o:"Greek",m:"glory and pride",v:["vintage","modern","royal","strong"]},
+
+  // boys
+  {n:"Atlas",g:"boy",p:"AT-ləss",o:"Greek",m:"to bear and endure; the titan who held the sky",v:["mythical","modern","strong","literary"]},
+  {n:"Oliver",g:"boy",p:"OL-ih-vər",o:"Latin",m:"the olive tree, a symbol of peace",v:["classic","nature","gentle"]},
+  {n:"Felix",g:"boy",p:"FEE-licks",o:"Latin",m:"happy and fortunate",v:["vintage","classic","joyful"]},
+  {n:"Orion",g:"boy",p:"oh-RY-ən",o:"Greek",m:"the hunter, written in the stars",v:["celestial","mythical","strong"]},
+  {n:"Rowan",g:"boy",p:"ROH-ən",o:"Gaelic",m:"the little red one; the rowan tree",v:["nature","modern"]},
+  {n:"Theodore",g:"boy",p:"THEE-ə-dor",o:"Greek",m:"a gift of the divine",v:["classic","vintage","royal"],r:["christian"]},
+  {n:"Caspian",g:"boy",p:"KASS-pee-ən",o:"Literary",m:"of the great sea",v:["modern","mythical","literary"]},
+  {n:"Silas",g:"boy",p:"SY-ləss",o:"Latin",m:"of the forest",v:["nature","vintage","gentle"],r:["christian"]},
+  {n:"Leo",g:"boy",p:"LEE-oh",o:"Latin",m:"the lion",v:["classic","celestial","strong"]},
+  {n:"Jasper",g:"boy",p:"JASS-pər",o:"Persian",m:"the bringer of treasure; the gemstone",v:["nature","vintage"]},
+  {n:"Arlo",g:"boy",p:"AR-loh",o:"English",m:"the fortified hill",v:["modern","vintage"]},
+  {n:"Ezra",g:"boy",p:"EZ-rah",o:"Hebrew",m:"a helper, one who gives aid",v:["classic","vintage","gentle"],r:["jewish","christian"]},
+  {n:"Finn",g:"boy",p:"FIN",o:"Irish",m:"fair and bright",v:["mythical","modern","joyful"]},
+  {n:"August",g:"boy",p:"AW-gəst",o:"Latin",m:"great and magnificent",v:["vintage","classic","royal","strong"]},
+  {n:"Cyrus",g:"boy",p:"SY-rəss",o:"Persian",m:"the sun, a lord",v:["celestial","classic","royal","strong"]},
+  {n:"Hugo",g:"boy",p:"HYOO-go",o:"Germanic",m:"a bright mind, intellect",v:["vintage","classic","joyful"]},
+  {n:"Elias",g:"boy",p:"eh-LY-əss",o:"Hebrew",m:"the Lord is my strength",v:["classic","vintage","strong"],r:["jewish","christian"]},
+  {n:"Ronan",g:"boy",p:"ROH-nən",o:"Irish",m:"a little seal of the sea",v:["mythical","nature","gentle"]},
+  {n:"Magnus",g:"boy",p:"MAG-nəss",o:"Latin",m:"the great one",v:["mythical","vintage","strong","royal"]},
+  {n:"Soren",g:"boy",p:"SOR-ən",o:"Danish",m:"stern and steady",v:["modern","vintage","strong"]},
+  {n:"Caleb",g:"boy",p:"KAY-leb",o:"Hebrew",m:"whole-hearted, devoted",v:["classic","strong"],r:["jewish","christian"]},
+
+  // either / unisex
+  {n:"Sage",g:"either",p:"SAYJ",o:"Latin",m:"wise; the calming herb",v:["nature","modern","gentle"]},
+  {n:"River",g:"either",p:"RIV-ər",o:"English",m:"a steady, flowing stream",v:["nature","modern","gentle"]},
+  {n:"Wren",g:"either",p:"REN",o:"English",m:"the small, brave songbird",v:["nature","modern","gentle"]},
+  {n:"Nova",g:"either",p:"NOH-vah",o:"Latin",m:"new; a star that suddenly blazes bright",v:["celestial","modern","strong","joyful"]},
+  {n:"Robin",g:"either",p:"ROB-in",o:"English",m:"bright fame; the cheerful bird",v:["nature","vintage","joyful","gentle"]},
+  {n:"Ellis",g:"either",p:"EL-iss",o:"Welsh",m:"benevolent and kind",v:["modern","classic","gentle"]},
+  {n:"Reese",g:"either",p:"REESS",o:"Welsh",m:"warmth and enthusiasm",v:["modern","vintage","joyful"]},
+  {n:"Sky",g:"either",p:"SKY",o:"English",m:"the wide open heavens",v:["celestial","nature","gentle"]},
+  {n:"Marlowe",g:"either",p:"MAR-loh",o:"English",m:"driftwood by the lake",v:["modern","vintage","literary"]},
+  {n:"Lennox",g:"either",p:"LEN-əks",o:"Scottish",m:"with many elm trees",v:["modern","nature","strong"]},
+
+  // —— names rooted in faith traditions ——
+  // Christian
+  {n:"Gabriel",g:"boy",p:"GAY-bree-əl",o:"Hebrew",m:"God is my strength",v:["classic","strong"],r:["christian","jewish"]},
+  {n:"Noah",g:"boy",p:"NOH-ah",o:"Hebrew",m:"rest and comfort",v:["classic","gentle"],r:["christian","jewish"]},
+  {n:"Luke",g:"boy",p:"LOOK",o:"Greek",m:"light-giving",v:["classic"],r:["christian"]},
+  {n:"Grace",g:"girl",p:"GRAYSS",o:"Latin",m:"grace and elegance",v:["classic","gentle"],r:["christian"]},
+  {n:"Ruth",g:"girl",p:"ROOTH",o:"Hebrew",m:"a loyal, compassionate friend",v:["vintage","gentle"],r:["christian","jewish"]},
+  {n:"Faith",g:"girl",p:"FAYTH",o:"English",m:"trust and belief",v:["modern","gentle"],r:["christian"]},
+  // Jewish
+  {n:"Asher",g:"boy",p:"ASH-ər",o:"Hebrew",m:"happy and blessed",v:["modern","joyful"],r:["jewish"]},
+  {n:"Naomi",g:"girl",p:"nay-OH-mee",o:"Hebrew",m:"pleasantness and sweetness",v:["vintage","gentle"],r:["jewish"]},
+  {n:"Hannah",g:"girl",p:"HAN-ah",o:"Hebrew",m:"grace and favor",v:["classic","gentle"],r:["jewish","christian"]},
+  {n:"Miriam",g:"girl",p:"MEER-ee-əm",o:"Hebrew",m:"a wished-for, beloved child",v:["vintage"],r:["jewish"]},
+  // Muslim
+  {n:"Layla",g:"girl",p:"LAY-lah",o:"Arabic",m:"night, dark beauty",v:["celestial","gentle"],r:["muslim"]},
+  {n:"Zara",g:"girl",p:"ZAR-ah",o:"Arabic",m:"radiance, a blooming flower",v:["modern","joyful"],r:["muslim"]},
+  {n:"Aisha",g:"girl",p:"AH-ee-shah",o:"Arabic",m:"alive and thriving",v:["classic","joyful"],r:["muslim"]},
+  {n:"Yusuf",g:"boy",p:"YOO-soof",o:"Arabic",m:"God shall increase",v:["classic"],r:["muslim"]},
+  {n:"Amir",g:"boy",p:"ah-MEER",o:"Arabic",m:"a prince, a leader",v:["royal","strong"],r:["muslim"]},
+  {n:"Idris",g:"boy",p:"ID-riss",o:"Arabic",m:"devoted to learning",v:["classic"],r:["muslim"]},
+  {n:"Noor",g:"either",p:"NOOR",o:"Arabic",m:"light",v:["celestial","gentle"],r:["muslim"]},
+  // Hindu
+  {n:"Aarav",g:"boy",p:"AH-rav",o:"Sanskrit",m:"peaceful and calm",v:["modern","gentle"],r:["hindu"]},
+  {n:"Arjun",g:"boy",p:"AR-juhn",o:"Sanskrit",m:"bright and shining; the hero",v:["mythical","strong"],r:["hindu"]},
+  {n:"Vivaan",g:"boy",p:"vih-VAHN",o:"Sanskrit",m:"full of life, the new dawn",v:["modern","joyful"],r:["hindu"]},
+  {n:"Diya",g:"girl",p:"DEE-yah",o:"Sanskrit",m:"a lamp, a small light",v:["celestial","gentle"],r:["hindu"]},
+  {n:"Anaya",g:"girl",p:"ah-NY-ah",o:"Sanskrit",m:"caring, without a superior",v:["modern","gentle"],r:["hindu"]},
+  {n:"Saanvi",g:"girl",p:"SAHN-vee",o:"Sanskrit",m:"of the goddess Lakshmi",v:["mythical"],r:["hindu"]},
+  {n:"Kiran",g:"either",p:"KEE-rən",o:"Sanskrit",m:"a ray of light",v:["celestial","gentle"],r:["hindu"]},
+  // Sikh
+  {n:"Arjan",g:"boy",p:"AR-juhn",o:"Punjabi",m:"the name of a beloved Guru",v:["classic","strong"],r:["sikh"]},
+  {n:"Jagdeep",g:"boy",p:"JAG-deep",o:"Punjabi",m:"the lamp of the world",v:["classic"],r:["sikh"]},
+  {n:"Simran",g:"girl",p:"SIM-rən",o:"Punjabi",m:"meditation on the divine",v:["gentle"],r:["sikh"]},
+  {n:"Harleen",g:"girl",p:"har-LEEN",o:"Punjabi",m:"absorbed in God's love",v:["gentle"],r:["sikh"]},
+  {n:"Gurpreet",g:"either",p:"GUR-preet",o:"Punjabi",m:"love of the Guru",v:["classic"],r:["sikh"]},
+  {n:"Jasmeet",g:"either",p:"JAS-meet",o:"Punjabi",m:"a friend of glory",v:["modern"],r:["sikh"]},
+  // Buddhist
+  {n:"Bodhi",g:"either",p:"BOH-dee",o:"Sanskrit",m:"awakening, enlightenment",v:["modern"],r:["buddhist"]},
+  {n:"Tenzin",g:"either",p:"TEN-zin",o:"Tibetan",m:"a holder of the teachings",v:["classic"],r:["buddhist"]},
+  {n:"Anand",g:"boy",p:"AH-nand",o:"Sanskrit",m:"bliss and joy",v:["joyful"],r:["buddhist","hindu"]},
+  {n:"Norbu",g:"boy",p:"NOR-boo",o:"Tibetan",m:"a precious jewel",v:["classic"],r:["buddhist"]},
+  {n:"Karuna",g:"girl",p:"kah-ROO-nah",o:"Sanskrit",m:"compassion",v:["gentle"],r:["buddhist"]},
+  {n:"Pema",g:"either",p:"PEH-mah",o:"Tibetan",m:"the lotus flower",v:["nature","gentle"],r:["buddhist"]},
+];
+
+const GCOLOR = {girl:"var(--rose)", boy:"var(--sky)", either:"var(--sage)"};
+const GLABEL = {girl:"For her", boy:"For him", either:"Either"};
+const RLABEL = {christian:"Christian", jewish:"Jewish", muslim:"Muslim", hindu:"Hindu", sikh:"Sikh", buddhist:"Buddhist"};
+
+let saved = [];
+let lastName = null;
+let lastMiddle = null;
+let lastBirth = null;
+
+// build letter dropdown from available names
+const letters = [...new Set(NAMES.map(x=>x.n[0]))].sort();
+const letterSel = document.getElementById('letter');
+letters.forEach(L=>{
+  const opt=document.createElement('option'); opt.value=L; opt.textContent=L; letterSel.appendChild(opt);
+});
+
+// pill groups
+function wireGroup(id, single){
+  const grp=document.getElementById(id);
+  grp.addEventListener('click', e=>{
+    const b=e.target.closest('.pill'); if(!b) return;
+    if(single){
+      grp.querySelectorAll('.pill').forEach(p=>p.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+    }
+  });
+}
+wireGroup('genderPills', true);
+wireGroup('vibePills', true);
+wireGroup('faithPills', true);
+wireGroup('midPills', true);
+
+// recolor the whole site to match the chosen gender
+function applyTheme(){
+  document.body.dataset.theme = chosen('genderPills').dataset.g;
+}
+document.getElementById('genderPills').addEventListener('click', e=>{
+  if(e.target.closest('.pill')) applyTheme();
+});
+
+// middle name: re-roll it live when the toggle changes
+function midOn(){ return chosen('midPills').dataset.mid==='on'; }
+function pickMiddle(first){
+  const g = chosen('genderPills').dataset.g;
+  const f = chosen('faithPills').dataset.f;
+  let mp = NAMES.filter(x=> (g==='either'?true:(x.g===g||x.g==='either'))
+                            && (f==='any'?true:(x.r && x.r.includes(f)))
+                            && x.n!==first.n);
+  if(!mp.length) mp = NAMES.filter(x=>x.n!==first.n);
+  return mp[Math.floor(Math.random()*mp.length)];
+}
+document.getElementById('midPills').addEventListener('click', e=>{
+  if(!e.target.closest('.pill') || !lastName) return;
+  lastMiddle = midOn() ? pickMiddle(lastName) : null;
+  render(lastName);
+});
+
+// ===== born under: zodiac + birth touches from a date =====
+function westernSign(m,d){
+  const signs=[
+    {n:'Capricorn',s:'♑',el:'Earth',t:'determined & wise',v:['classic','strong'],last:[1,19]},
+    {n:'Aquarius',s:'♒',el:'Air',t:'original & free-spirited',v:['modern','celestial'],last:[2,18]},
+    {n:'Pisces',s:'♓',el:'Water',t:'dreamy & tender',v:['celestial','gentle'],last:[3,20]},
+    {n:'Aries',s:'♈',el:'Fire',t:'bold & pioneering',v:['strong','modern'],last:[4,19]},
+    {n:'Taurus',s:'♉',el:'Earth',t:'steady & loyal',v:['nature','classic'],last:[5,20]},
+    {n:'Gemini',s:'♊',el:'Air',t:'curious & lively',v:['joyful','modern'],last:[6,20]},
+    {n:'Cancer',s:'♋',el:'Water',t:'gentle & nurturing',v:['gentle','vintage'],last:[7,22]},
+    {n:'Leo',s:'♌',el:'Fire',t:'warm-hearted & regal',v:['strong','royal'],last:[8,22]},
+    {n:'Virgo',s:'♍',el:'Earth',t:'thoughtful & kind',v:['gentle','classic'],last:[9,22]},
+    {n:'Libra',s:'♎',el:'Air',t:'graceful & harmonious',v:['gentle','joyful'],last:[10,22]},
+    {n:'Scorpio',s:'♏',el:'Water',t:'deep & magnetic',v:['mythical','strong'],last:[11,21]},
+    {n:'Sagittarius',s:'♐',el:'Fire',t:'adventurous & free',v:['modern','joyful'],last:[12,21]},
+  ];
+  for(const sgn of signs){ if(m<sgn.last[0] || (m===sgn.last[0] && d<=sgn.last[1])) return sgn; }
+  return signs[0]; // late December -> Capricorn
+}
+function chineseZodiac(y){
+  const a=[
+    {n:'Rat',s:'🐀',t:'clever & resourceful',v:['modern','joyful']},
+    {n:'Ox',s:'🐂',t:'steady & dependable',v:['strong','classic']},
+    {n:'Tiger',s:'🐅',t:'brave & spirited',v:['strong','mythical']},
+    {n:'Rabbit',s:'🐇',t:'gentle & graceful',v:['gentle','nature']},
+    {n:'Dragon',s:'🐉',t:'confident & lucky',v:['strong','royal']},
+    {n:'Snake',s:'🐍',t:'wise & intuitive',v:['mythical','gentle']},
+    {n:'Horse',s:'🐎',t:'free & energetic',v:['modern','joyful']},
+    {n:'Goat',s:'🐐',t:'gentle & artistic',v:['gentle','nature']},
+    {n:'Monkey',s:'🐒',t:'playful & curious',v:['joyful','modern']},
+    {n:'Rooster',s:'🐓',t:'bright & honest',v:['classic','joyful']},
+    {n:'Dog',s:'🐕',t:'loyal & kind',v:['gentle','classic']},
+    {n:'Pig',s:'🐖',t:'warm & generous',v:['joyful','gentle']},
+  ];
+  return a[(((y-4)%12)+12)%12];
+}
+function deriveBirth(str){
+  if(!str) return null;
+  const dt=new Date(str+'T00:00:00');
+  if(isNaN(dt.getTime())) return null;
+  const m=dt.getMonth()+1, day=dt.getDate(), y=dt.getFullYear();
+  const STONE=['Garnet','Amethyst','Aquamarine','Diamond','Emerald','Pearl','Ruby','Peridot','Sapphire','Opal','Topaz','Turquoise'];
+  const FLOWER=['Carnation','Violet','Daffodil','Daisy','Lily of the valley','Rose','Larkspur','Gladiolus','Aster','Marigold','Chrysanthemum','Narcissus'];
+  return {west:westernSign(m,day), chin:chineseZodiac(y), stone:STONE[m-1], flower:FLOWER[m-1]};
+}
+document.getElementById('bday').addEventListener('change', e=>{
+  lastBirth = deriveBirth(e.target.value);
+  if(lastName) render(lastName);
+});
+
+function chosen(id){ return document.querySelector('#'+id+' .pill[aria-pressed="true"]'); }
+
+function pool(){
+  const g = chosen('genderPills').dataset.g;
+  const v = chosen('vibePills').dataset.v;
+  const f = chosen('faithPills').dataset.f;
+  const L = letterSel.value;
+  return NAMES.filter(x=>{
+    let gOk = g==='either' ? true : (x.g===g || x.g==='either');
+    let vOk = v==='any' ? true : x.v.includes(v);
+    let fOk = f==='any' ? true : (x.r && x.r.includes(f));
+    let lOk = L==='any' ? true : x.n[0]===L;
+    return gOk && vOk && fOk && lOk;
+  });
+}
+
+function escapeHtml(str){return (str||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function render(name){
+  const r=document.getElementById('result');
+  if(!name){
+    r.innerHTML = `<div class="empty">No names match that exact mix yet — try loosening the feeling or the starting letter, and we'll find one.</div>`;
+    return;
+  }
+  lastName = name;
+  const sur = escapeHtml(document.getElementById('surname').value.trim());
+  const mid = lastMiddle;
+  const full = name.n + (mid?' '+mid.n:'') + (sur?' '+sur:'');
+  const isSaved = saved.some(s=>s.n===name.n);
+  r.innerHTML = `
+    <div class="name-card" id="nameCard">
+      <span class="gtag"><span class="gdot" style="background:${GCOLOR[name.g]}"></span>${GLABEL[name.g]}</span>
+      <div class="name">${name.n}</div>
+      ${(mid||sur)?`<div class="fullname">${full}</div>`:''}
+      ${mid?`<div class="midmeaning">middle name · <b>${mid.n}</b>, ${mid.m}</div>`:''}
+      <div class="pron">${name.p}</div>
+      <p class="meaning"><strong>${name.n}</strong> means <strong>${name.m}</strong>.</p>
+      <div class="chips">
+        <span class="chip">origin · <b>${name.o}</b></span>
+        ${(name.r||[]).map(t=>`<span class="chip">faith · <b>${RLABEL[t]}</b></span>`).join('')}
+        ${name.v.map(t=>`<span class="chip"><b>${t}</b></span>`).join('')}
+      </div>
+      ${lastBirth?`
+      <div class="zodiac">
+        <div class="zhead">born under</div>
+        <div class="zgrid">
+          <div class="zbadge"><span class="zsym">${lastBirth.west.s}</span><b>${lastBirth.west.n}</b><i>${lastBirth.west.el} · ${lastBirth.west.t}</i></div>
+          <div class="zbadge"><span class="zsym">${lastBirth.chin.s}</span><b>${lastBirth.chin.n}</b><i>${lastBirth.chin.t}</i></div>
+          <div class="zbadge"><span class="zsym">💎</span><b>${lastBirth.stone}</b><i>birthstone</i></div>
+          <div class="zbadge"><span class="zsym">🌸</span><b>${lastBirth.flower}</b><i>birth flower</i></div>
+        </div>
+      </div>`:''}
+      <div class="actions">
+        <button class="btn save" id="saveBtn" aria-pressed="${isSaved}">
+          <span class="heart">${isSaved?'♥':'♡'}</span> ${isSaved?'Saved':'Save this name'}
+        </button>
+        <button class="btn" id="againBtn">↻ Show another</button>
+      </div>
+    </div>`;
+  document.getElementById('saveBtn').addEventListener('click', toggleSave);
+  document.getElementById('againBtn').addEventListener('click', generate);
+  sparkle(document.getElementById('nameCard'));
+}
+
+let lastPick = null;
+function generate(){
+  const list = pool();
+  if(list.length===0){ render(null); return; }
+  // lean toward the baby's zodiac qualities when a birth date is set
+  let candidates = list;
+  if(lastBirth){
+    const prefs = [...lastBirth.west.v, ...lastBirth.chin.v];
+    const matched = list.filter(x=>x.v.some(t=>prefs.includes(t)));
+    if(matched.length) candidates = matched;
+  }
+  let pick;
+  // avoid repeating the same name twice in a row when possible
+  do { pick = candidates[Math.floor(Math.random()*candidates.length)]; }
+  while(candidates.length>1 && pick.n===lastPick);
+  lastPick = pick.n;
+  lastMiddle = midOn() ? pickMiddle(pick) : null;
+  render(pick);
+}
+
+function toggleSave(){
+  if(!lastName) return;
+  const i = saved.findIndex(s=>s.n===lastName.n);
+  if(i>=0) saved.splice(i,1);
+  else saved.push({...lastName, middle: lastMiddle?lastMiddle.n:'', surname: document.getElementById('surname').value.trim()});
+  render(lastName);
+  renderSaved();
+}
+
+function renderSaved(){
+  document.getElementById('savedCount').textContent = saved.length;
+  const area=document.getElementById('savedArea');
+  if(saved.length===0){
+    area.innerHTML = `<div class="saved-empty">Nothing kept yet. When a name feels right, tap its heart and it'll wait for you here.</div>`;
+    return;
+  }
+  area.innerHTML = `<div class="saved-grid">` + saved.map((s,idx)=>`
+    <div class="saved">
+      <button class="rm" data-i="${idx}" aria-label="Remove ${s.n}">✕</button>
+      <div class="sn">${escapeHtml([s.n, s.middle, s.surname].filter(Boolean).join(' '))}</div>
+      <div class="sm">${s.m}</div>
+    </div>`).join('') + `</div>`;
+  area.querySelectorAll('.rm').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      saved.splice(+b.dataset.i,1);
+      if(lastName) render(lastName);
+      renderSaved();
+    });
+  });
+}
+
+function sparkle(card){
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const rect = card.getBoundingClientRect();
+  const colors=['#E6A6B4','#F2C879','#A7C4A0','#Acc9e0'];
+  for(let i=0;i<7;i++){
+    const s=document.createElement('div');
+    s.className='spark';
+    s.style.left=(20+Math.random()*(rect.width-40))+'px';
+    s.style.top=(20+Math.random()*120)+'px';
+    const c=colors[i%colors.length];
+    s.innerHTML=`<svg viewBox="0 0 24 24"><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5z" fill="${c}"/></svg>`;
+    card.appendChild(s);
+    setTimeout(()=>s.remove(),1000);
+  }
+}
+
+document.getElementById('genBtn').addEventListener('click', generate);
+applyTheme();
+renderSaved();
+</script>
+</body>
+</html>
