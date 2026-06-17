@@ -130,6 +130,9 @@
   .text-in::placeholder{color:#C9B7BF;font-weight:500;}
   .text-in:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 4px rgba(199,107,131,.12);}
   .text-in + .hint{display:block;color:var(--soft);font-size:.86rem;}
+  .hemi-row{display:flex;align-items:center;gap:9px;margin:10px 0 2px;flex-wrap:wrap;}
+  .hemi-row .hint{margin:0;}
+  .pill.mini{padding:6px 13px;font-size:.85rem;}
   .fullname{
     font-family:'Fraunces',serif;font-weight:500;color:var(--rose-deep);
     font-size:clamp(1.3rem,5vw,1.7rem);margin:2px 0 6px;letter-spacing:-.01em;
@@ -361,7 +364,14 @@
     <div class="field">
       <div class="label"><span class="dot"></span>Birthday or due date <span class="opt">optional</span></div>
       <input id="bday" class="text-in" type="date">
-      <span class="hint">reveals the star sign, Chinese zodiac, birthstone &amp; flower — and leans names that way</span>
+      <div class="hemi-row">
+        <span class="hint">seasons for</span>
+        <div class="pills" id="hemiPills" role="group">
+          <button class="pill mini" data-h="north" aria-pressed="true">Northern</button>
+          <button class="pill mini" data-h="south" aria-pressed="false">Southern</button>
+        </div>
+      </div>
+      <span class="hint">reveals the star sign, Chinese zodiac, life path, birthstone &amp; flower — and leans names that way</span>
     </div>
 
     <button class="generate" id="genBtn">
@@ -523,6 +533,7 @@ function wireGroup(id, single){
 wireGroup('genderPills', true);
 wireGroup('vibePills', true);
 wireGroup('faithPills', true);
+wireGroup('hemiPills', true);
 wireGroup('midPills', true);
 
 // recolor the whole site to match the chosen gender
@@ -591,7 +602,8 @@ function chineseZodiac(y,m,d){
   if(c && (m<c[0] || (m===c[0] && d<c[1]))) ey=y-1; // born before the new year -> previous animal
   return a[(((ey-4)%12)+12)%12];
 }
-function birthSeason(m){
+function birthSeason(m, south){
+  if(south) m = ((m+5)%12)+1; // southern seasons are six months offset
   if(m===12||m<=2) return {n:'Winter',s:'❄️',v:['celestial','gentle']};
   if(m<=5) return {n:'Spring',s:'🌷',v:['nature','joyful']};
   if(m<=8) return {n:'Summer',s:'☀️',v:['joyful','celestial']};
@@ -606,18 +618,26 @@ function nameNumber(str){
   while(sum>9 && sum!==11 && sum!==22 && sum!==33){ sum=String(sum).split('').reduce((a,c)=>a+(+c),0); }
   return sum;
 }
-function deriveBirth(str){
+// Life path: reduce month + day + year (each reduced first), keeping master numbers
+function reduceNum(n){ while(n>9 && n!==11 && n!==22 && n!==33){ n=String(n).split('').reduce((a,c)=>a+(+c),0);} return n; }
+function lifePath(y,m,d){ return reduceNum(reduceNum(m)+reduceNum(d)+reduceNum(y)); }
+function deriveBirth(str, south){
   if(!str) return null;
   const dt=new Date(str+'T00:00:00');
   if(isNaN(dt.getTime())) return null;
   const m=dt.getMonth()+1, day=dt.getDate(), y=dt.getFullYear();
   const STONE=['Garnet','Amethyst','Aquamarine','Diamond','Emerald','Pearl','Ruby','Peridot','Sapphire','Opal','Topaz','Turquoise'];
   const FLOWER=['Carnation','Violet','Daffodil','Daisy','Lily of the valley','Rose','Larkspur','Gladiolus','Aster','Marigold','Chrysanthemum','Narcissus'];
-  return {west:westernSign(m,day), chin:chineseZodiac(y,m,day), season:birthSeason(m), stone:STONE[m-1], flower:FLOWER[m-1]};
+  return {west:westernSign(m,day), chin:chineseZodiac(y,m,day), season:birthSeason(m,south), life:lifePath(y,m,day), stone:STONE[m-1], flower:FLOWER[m-1]};
 }
-document.getElementById('bday').addEventListener('change', e=>{
-  lastBirth = deriveBirth(e.target.value);
+function hemiSouth(){ return chosen('hemiPills').dataset.h==='south'; }
+function refreshBirth(){
+  lastBirth = deriveBirth(document.getElementById('bday').value, hemiSouth());
   if(lastName) render(lastName);
+}
+document.getElementById('bday').addEventListener('change', refreshBirth);
+document.getElementById('hemiPills').addEventListener('click', e=>{
+  if(e.target.closest('.pill')) refreshBirth();
 });
 
 function chosen(id){ return document.querySelector('#'+id+' .pill[aria-pressed="true"]'); }
@@ -671,6 +691,7 @@ function render(name){
           <div class="zbadge"><span class="zsym">${lastBirth.west.s}</span><b>${lastBirth.west.n}</b><i>${lastBirth.west.el} · ${lastBirth.west.t}</i></div>
           <div class="zbadge"><span class="zsym">${lastBirth.chin.s}</span><b>${lastBirth.chin.n}</b><i>${lastBirth.chin.t}</i></div>
           <div class="zbadge"><span class="zsym">${lastBirth.season.s}</span><b>${lastBirth.season.n}</b><i>season of birth</i></div>
+          <div class="zbadge"><span class="zsym">${lastBirth.life}</span><b>Life path ${lastBirth.life}</b><i>${NUMO[lastBirth.life]}</i></div>
           <div class="zbadge"><span class="zsym">💎</span><b>${lastBirth.stone}</b><i>birthstone</i></div>
           <div class="zbadge"><span class="zsym">🌸</span><b>${lastBirth.flower}</b><i>birth flower</i></div>
         </div>
